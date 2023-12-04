@@ -12,7 +12,7 @@ sampleInput = '''467..114..
 
 def input = new File('inputs/day3-1.txt').readLines()
 
-PART_PATTERN = ~/[^\d\.]/
+PART_PATTERN = ~/\*/
 NUMBER_PATTERN = ~/\d+/
 
 def solve(List<String> lines) {
@@ -24,18 +24,21 @@ def solve(List<String> lines) {
         }
         [(i): positions]
     }
-    lines.withIndex().sum { line, i ->
+    def gears = [:].withDefault([:].withDefault([]))
+    lines.eachWithIndex { line, i ->
         def suma = 0
         def matcher = line =~ NUMBER_PATTERN
         while (matcher.find()) {
-            if ((i > 0 && patterns[i-1].any { it >= matcher.start()-1 && it <= matcher.end() }) ||
-            patterns[i].any { it >= matcher.start()-1 && it <= matcher.end() } || 
-            (i+1 < lines.size() && patterns[i+1].any { it >= matcher.start()-1 && it <= matcher.end() })) {
-                suma += matcher.group() as long
+            if (i > 0){
+                patterns[i-1].findAll { it >= matcher.start()-1 && it <= matcher.end() }.each { gears[i-1][it] << matcher.group()})
+            }
+            patterns[i].findAll { it >= matcher.start()-1 && it <= matcher.end() }.each { gears[i][it] << matcher.group()})
+            if (i+1 < lines.size()){
+                patterns[i+1].findAll { it >= matcher.start()-1 && it <= matcher.end() }.each { gears[i+1][it] << matcher.group()})
             }
         }
-        suma   
     }
+    gears.sum {i, row -> v.findAll {j, nums -> nums.size() == 2}.sum {j, nums -> (nums[0] as long) * (nums[1] as long)} }
 }
 
 
