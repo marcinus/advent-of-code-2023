@@ -24,24 +24,23 @@ def solve(List<String> lines) {
         }
         [(i): positions]
     }
-    def gears = [:].withDefault([:].withDefault([]))
+    def gears = [:].withDefault { [:].withDefault{[]} }
     lines.eachWithIndex { line, i ->
         def suma = 0
         def matcher = line =~ NUMBER_PATTERN
         while (matcher.find()) {
             if (i > 0){
-                patterns[i-1].findAll { it >= matcher.start()-1 && it <= matcher.end() }.each { gears[i-1][it] << matcher.group()})
+                patterns[i-1].findAll { it >= matcher.start()-1 && it <= matcher.end() }.each { gears[i-1][it] << matcher.group()}
             }
-            patterns[i].findAll { it >= matcher.start()-1 && it <= matcher.end() }.each { gears[i][it] << matcher.group()})
+            patterns[i].findAll { it >= matcher.start()-1 && it <= matcher.end() }.each { gears[i][it] << matcher.group()}
             if (i+1 < lines.size()){
-                patterns[i+1].findAll { it >= matcher.start()-1 && it <= matcher.end() }.each { gears[i+1][it] << matcher.group()})
+                patterns[i+1].findAll { it >= matcher.start()-1 && it <= matcher.end() }.each { gears[i+1][it] << matcher.group()}
             }
         }
     }
-    gears.sum {i, row -> v.findAll {j, nums -> nums.size() == 2}.sum {j, nums -> (nums[0] as long) * (nums[1] as long)} }
+    gears.collect {i, row -> (row.findAll {j, nums -> nums.size() == 2}
+    .collect {j, nums -> (nums[0] as long) * (nums[1] as long)} ?: []).sum() ?: 0 }.sum()
 }
 
-
-
-assert 4361 == solve(sampleInput)
+assert 467835 == solve(sampleInput)
 println solve(input)
